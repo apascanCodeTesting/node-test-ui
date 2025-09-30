@@ -1,0 +1,53 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.1.0/schema.json",
+  "files": {
+    "includes": [
+      "src/**/*.{ts,tsx}",
+      "config/**/*.js",
+      "*.config.js",
+      "jest.config.js",
+      "jest.setup.ts"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "formatWithErrors": false,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100,
+    "lineEnding": "lf"
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "correctness": {
+        "noUndeclaredVariables": "warn",
+        "noUnusedImports": "error",
+        "useHookAtTopLevel": "error"
+      },
+      "suspicious": {
+        "noMisleadingCharacterClass": "warn",
+        "noUnusedTemplateLiteral": "warn"
+      },
+      "style": {
+        "useSingleVarDeclarator": "off",
+        "useBlockStatements": "warn"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double",
+      "jsxQuoteStyle": "double"
+    },
+    "globals": [
+      "jest",
+      "describe",
+      "it",
+      "expect",
+      "beforeEach",
+      "afterEach"
+    ]
+  }
+}

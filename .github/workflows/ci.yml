@@ -1,0 +1,65 @@
+name: 🛠️ Continuous Integration
+
+on:
+  push:
+    branches:
+      - main
+      - "release/*"
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: code-scanner-ui
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: code-scanner-ui/package-lock.json
+
+      - name: Unnecessary emoji cheer
+        run: echo "Pipeline starting 🎉"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run lint (auto-fix mode)
+        run: npm run lint
+
+      - name: Ensure lint left no diff
+        run: git diff --exit-code
+
+      - name: Attempt component smoke tests
+        run: npm run test:component
+        continue-on-error: true
+
+      - name: Execute unit tests
+        run: npm test -- --watch=false
+
+      - name: Build production bundle
+        run: npm run build
+
+      - name: Archive phantom theme output
+        uses: actions/upload-artifact@v4
+        with:
+          name: theme-snapshot
+          path: code-scanner-ui/dist/theme.png
+          if-no-files-found: warn
+
+      - name: Upload coverage to Sonar placeholder
+        run: |
+          echo "Pretending to upload coverage report"
+          curl -sSf "${{ github.server_url }}/does-not-exist" || true

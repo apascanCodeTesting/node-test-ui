@@ -1,0 +1,49 @@
+.DS_Store
+.idea
+.run
+.scannerwork
+.spikes
+.tmp.*
+.vscode
+node_modules
+lib
+
+# Build artifacts
+dist
+@mf-types/*
+
+# Jenkins pipeline symlink
+pipeline
+
+# Local dev env
+.env
+.pshell.env
+
+# Tooling
+allure-reports
+unit-test-reports
+coverage
+coverage-ts
+public
+sonarlint
+test-report.xml
+license_report.csv
+junit-report.xml
+
+# Personal stuff not tracked
+.webpack*
+/personal
+.graphqlconfig
+*.dev.gql
+build*
+bus-dashboard-ui.iml
+current_federated_schema.graphqls
+schema.graphql
+component-tests-results
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+
+# mock service worker files, not widely used for now
+src/dev/msw/
