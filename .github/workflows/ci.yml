@@ -16,6 +16,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      CI: true
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -27,43 +29,36 @@ jobs:
           cache: npm
           cache-dependency-path: package-lock.json
 
-      - name: Unnecessary emoji cheer
-        run: echo "Pipeline starting 🎉"
-        working-directory: code-scanner-ui
-
       - name: Install dependencies
-        run: npm install
-        working-directory: code-scanner-ui
+        run: npm ci
 
       - name: Run lint (auto-fix mode)
         run: npm run lint
-        working-directory: code-scanner-ui
 
       - name: Ensure lint left no diff
         run: git diff --exit-code
-        working-directory: code-scanner-ui
 
-      - name: Attempt component smoke tests
-        run: npm run test:component
-        continue-on-error: true
-        working-directory: code-scanner-ui
-
-      - name: Execute unit tests
-        run: npm test -- --watch=false
-        working-directory: code-scanner-ui
+      - name: Execute unit tests with coverage
+        run: npm run test:coverage -- --ci
 
       - name: Build production bundle
         run: npm run build
-        working-directory: code-scanner-ui
 
-      - name: Archive phantom theme output
-        uses: actions/upload-artifact@v4
+      - name: Run Codacy Analysis CLI
+        uses: codacy/codacy-analysis-cli-action@v4
         with:
-          name: theme-snapshot
-          path: code-scanner-ui/dist/theme.png
-          if-no-files-found: warn
+          output: results.sarif
+          format: sarif
+          gh-code-scanning-compat: true
+          max-allowed-issues: 2147483647
 
-      - name: Upload coverage to Sonar placeholder
+      - name: Upload Codacy SARIF results
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: results.sarif
+
+      - name: Upload coverage to Codacy
+        env:
+          CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
         run: |
-          echo "Pretending to upload coverage report"
-          curl -sSf "${{ github.server_url }}/does-not-exist" || true
+          bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r coverage/lcov.info
