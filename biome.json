@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.1.0/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.2.4/schema.json",
   "files": {
     "includes": [
       "src/**/*.{ts,tsx}",
@@ -27,12 +27,12 @@
         "useHookAtTopLevel": "error"
       },
       "suspicious": {
-        "noMisleadingCharacterClass": "warn",
-        "noUnusedTemplateLiteral": "warn"
+        "noMisleadingCharacterClass": "warn"
       },
       "style": {
         "useSingleVarDeclarator": "off",
-        "useBlockStatements": "warn"
+        "useBlockStatements": "warn",
+        "noUnusedTemplateLiteral": "warn"
       }
     }
   },
@@ -41,13 +41,6 @@
       "quoteStyle": "double",
       "jsxQuoteStyle": "double"
     },
-    "globals": [
-      "jest",
-      "describe",
-      "it",
-      "expect",
-      "beforeEach",
-      "afterEach"
-    ]
+    "globals": ["jest", "describe", "it", "expect", "beforeEach", "afterEach"]
   }
 }
