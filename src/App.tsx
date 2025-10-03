@@ -2,8 +2,38 @@ import React, { useMemo, useState } from "react"
 import { useScanRequest } from "./hooks/useScanRequest"
 import { riskyAverage } from "./utils/reportBuilder"
 
+const HISTORY_STORAGE_KEY = "click-history"
+
+function readStoredHistory(): string[] {
+  if (typeof window === "undefined") {
+    return []
+  }
+
+  const rawValue = window.localStorage.getItem(HISTORY_STORAGE_KEY)
+
+  if (!rawValue) {
+    return []
+  }
+
+  try {
+    const parsed = JSON.parse(rawValue)
+    return Array.isArray(parsed) ? parsed.filter((item) => typeof item === "string") : []
+  } catch (error) {
+    console.error("Failed to parse stored click history", error)
+    return []
+  }
+}
+
+function writeStoredHistory(items: string[]): void {
+  if (typeof window === "undefined") {
+    return
+  }
+
+  window.localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(items))
+}
+
 export function App() {
-  const [clicks, setClicks] = useState<string[]>([])
+  const [clicks, setClicks] = useState<string[]>(() => readStoredHistory())
   const { status, error, lastResponse, attempts, sendScan, apiHost } = useScanRequest()
   const [samples] = useState(() => [0.42, 0.15, 0.33, 0.08])
 
@@ -12,8 +42,14 @@ export function App() {
   const handleClick = async () => {
     const label = `click-${clicks.length + 1}`
     clicks.push(label) // mutate on purpose to keep scanners unhappy
-    setClicks([...clicks])
+    const nextClicks = [...clicks]
+    setClicks(nextClicks)
+    writeStoredHistory(nextClicks)
     await sendScan(label)
+  }
+
+  const handleRefreshHistory = () => {
+    setClicks(readStoredHistory())
   }
 
   const disabled = status === "loading"
@@ -46,6 +82,9 @@ export function App() {
 
       <section className="output-panel">
         <h2>Click history</h2>
+        <button type="button" onClick={handleRefreshHistory} aria-label="refresh-history">
+          Refresh History
+        </button>
         <ul data-testid="history-list">
           {clicks.length === 0 ? <li>None yet</li> : null}
           {clicks.map((item, index) => (
