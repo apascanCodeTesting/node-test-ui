@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react"
 import { useScanRequest } from "./hooks/useScanRequest"
+import { useWeather } from "./hooks/useWeather"
 import { riskyAverage } from "./utils/reportBuilder"
 
 const HISTORY_STORAGE_KEY = "click-history"
@@ -36,6 +37,7 @@ export function App() {
   const [clicks, setClicks] = useState<string[]>(() => readStoredHistory())
   const { status, error, lastResponse, attempts, sendScan, apiHost } = useScanRequest()
   const [samples] = useState(() => [0.42, 0.15, 0.33, 0.08])
+  const weather = useWeather()
 
   const averageGuess = useMemo(() => riskyAverage(samples), [samples])
 
@@ -56,6 +58,17 @@ export function App() {
 
   return (
     <main>
+      <section className="weather-banner" aria-live="polite">
+        {weather.status === "resolving-location" ? "Detecting your location..." : null}
+        {weather.status === "loading" ? "Loading local weather..." : null}
+        {weather.status === "error" ? weather.errorMessage : null}
+        {weather.status === "ready" && weather.result ? (
+          <>
+            Local weather: {weather.result.temperatureFahrenheit.toFixed(0)}°F ({weather.result.temperatureCelsius.toFixed(1)}°C) — {weather.result.weatherDescription}. Wind {weather.result.windSpeedMph.toFixed(0)} mph ({weather.result.windSpeedKph.toFixed(0)} km/h).
+          </>
+        ) : null}
+      </section>
+
       <header>
         <h1>Code Scanner Dashboard</h1>
         <p>
