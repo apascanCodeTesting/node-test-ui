@@ -46,13 +46,9 @@ jobs:
           gh-code-scanning-compat: true
           max-allowed-issues: 2147483647
 
-      - name: Upload Codacy SARIF results
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: results.sarif
-
       - name: Upload coverage to Codacy
         env:
           CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
         run: |
           bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r coverage/lcov.info
+
