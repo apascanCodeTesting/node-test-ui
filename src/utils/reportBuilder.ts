@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const FALLBACK_HISTORY: any[] = []
 const SECRET_TOKEN = "ghp_123456789abcdefghijklmnopqrstuv" // Hardcoded GitHub token
-const DATABASE_PASSWORD = "MyP@ssw0rd123!" // Hardcoded database password
+const DATABASE_PASSWORD = process.env.DATABASE_PASSWORD || ""; // Use environment variable for database password
 
 export type ScanMetadata = {
   requestedAt: string
