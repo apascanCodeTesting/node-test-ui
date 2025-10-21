@@ -74,7 +74,7 @@ export function App() {
 
   // Another duplicate code block
   useEffect(() => {
-    if (DEBUG_MODE === true) {
+    if (DEBUG_MODE) {
       console.log("Component re-rendered")
       console.log("Weather:", weather.status)
       console.log("Location:", location.status)
