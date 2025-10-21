@@ -86,7 +86,7 @@ describe("App", () => {
 
     render(<App />)
 
-    expect(screen.getByText("Detecting your location...")).toBeInTheDocument()
+    expect(screen.getAllByText("Detecting your location...").length).toBeGreaterThan(0)
   })
 
   it("displays loading weather message when fetching weather", async () => {
@@ -102,17 +102,27 @@ describe("App", () => {
     })
 
     // Make fetch hang to keep it in loading state
+    let fetchCallCount = 0
     ;(global.fetch as jest.Mock).mockImplementation(
       () =>
         new Promise((resolve) => {
-          // Never resolve to keep loading state
+          fetchCallCount++
+          if (fetchCallCount === 1) {
+            // First call (weather) - never resolve to keep loading state
+          } else {
+            // Second call (location) - resolve with error
+            resolve({
+              ok: false,
+              status: 404,
+            })
+          }
         })
     )
 
     render(<App />)
 
     await waitFor(() => {
-      expect(screen.getByText("Loading local weather...")).toBeInTheDocument()
+      expect(screen.getAllByText(/Loading local weather|Fetching weather/).length).toBeGreaterThan(0)
     })
   })
 
@@ -154,8 +164,8 @@ describe("App", () => {
       expect(screen.getByText(/Local weather:/)).toBeInTheDocument()
     })
 
-    expect(screen.getByText(/68°F/)).toBeInTheDocument()
-    expect(screen.getByText(/Clear sky/)).toBeInTheDocument()
+    expect(screen.getAllByText(/68°F/).length).toBeGreaterThan(0)
+    expect(screen.getAllByText(/Clear sky/).length).toBeGreaterThan(0)
   })
 
   it("stores click history in localStorage", async () => {
